@@ -1,0 +1,23 @@
+{
+    "stripe": {
+        "monthlyPlan": "price_1JKPoyJlyqFyhP1KAu5jdIBo",
+        "yearlyPlan": "price_1JL6uhJlyqFyhP1KtZ0IVYFd"
+    },
+    "discord": {
+        "serverID": "870683820976898058",
+        "roleID": "870695832775692298",
+        "prefix": "!",
+        "inviteLink": "https://discord.gg/CjdCYuWCrP",
+        "channels": {
+            "STARTHERE_CHANNEL": "871423199408193576",
+            "COMMUNITY_CHAT": "870684030717280267",
+            "COMMUNITY_ALERTS": "871842512485105695",
+            "COMMANDS": "871775062389309500",
+            "PREMIUM_CHATS": "870684156240224297",
+            "PREMIUM_ALERTS": "870723047043244072",
+            "NEWS_TRENDS": "871425657719124008",
+            "LIVE_TRADING": "872147272408916018",
+            "EMOJI_TRIGGER_MESSAGE": "872873881503932466"
+        }
+    }
+}
