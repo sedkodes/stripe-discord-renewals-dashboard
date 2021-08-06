@@ -28,6 +28,9 @@ mongoose.connect(process.env.MONGO_URI, { useUnifiedTopology: true, useNewUrlPar
 const { authRoutes } = require('./routes/authRoutes');
 const stripeRoutes = require('./routes/stripeRoutes');
 
+app.get('/hello', (req, res) => {
+    res.send('Hello World!')
+})
 app.use('/auth', authRoutes);
 app.use('/stripe', stripeRoutes);
 
