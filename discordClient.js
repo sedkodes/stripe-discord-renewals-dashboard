@@ -107,7 +107,6 @@ messageReactionLogic = async (messageReaction, user) => {
     } else if (messageReaction.emoji.name === '🔓') {
     
         await addRole(user.id)
-        user.send("Subscription started!  Welcome aboard.")
     } else {
         return;
     }
