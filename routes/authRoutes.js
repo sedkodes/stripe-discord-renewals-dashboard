@@ -47,7 +47,7 @@ exchangeAccessTokenForEmail = async(response) => {
             'Authorization': `Bearer ${response.access_token}`
         }
     });
-    console.debug('Oauth Token response data: ', discordResponse.data)
+    // console.debug('Oauth Token response data: ', discordResponse.data)
 
     if (discordResponse.status !== 200){
         return res.status(404).json({msg: "Request Error"});
@@ -64,7 +64,7 @@ exchangeCodeForAccessToken = async(req) => {
         return res.status(403).json({msg: "Error no code"});
     }
 
-    console.debug("code: ", req.query.code)
+    // console.debug("code: ", req.query.code)
 
     // Exchange Code for Token
     const code = req.query.code;

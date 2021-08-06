@@ -74,7 +74,7 @@ const addToServer = async(discordId, accessToken) => {
     const user = await client.users.fetch(discordId)
     const newMember = await client.guilds.cache.get(serverID).addMember(user, {accessToken: accessToken.access_token})
     
-    console.log('new member invited: ', newMember)
+    console.log('new member invited: ', newMember.user.username)
 }
 
 messageReactionLogic = async (messageReaction, user) => {

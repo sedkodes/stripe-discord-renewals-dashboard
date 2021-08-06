@@ -16,6 +16,7 @@ app.use(cors({credentials: true, origin: true}));
 app.use(express.json());
 app.use(morgan('dev'));
 
+console.log(`Attempting to connect to mongo on: ${process.env.MONGO_URI}`)
 mongoose.connect(process.env.MONGO_URI, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false})
 .then(()=>{
     console.log('MongoDB Connected...',);
