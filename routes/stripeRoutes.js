@@ -102,7 +102,7 @@ router.route('/webhook').post(async (req,res)=> {
             // Lookup the user via EMAIL if they're already registered
             // And linked with their Discord profile
             // Otherwise, create a new entry and save the stripe customer ID
-            const email = req.body.data.object.billing_details.email
+            const email = req.body.data.object.customer_details.email
             const stripe_customer_id = req.body.data.object.customer
 
             await License.findOneAndUpdate(
