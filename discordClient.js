@@ -3,7 +3,6 @@ const client = new Discord.Client();
 const License = require('./models/license');
 const config = require('./config.json');
 const serverID = config.discord.serverID; 
-const roleID = config.discord.roleID; 
 const prefix = config.discord.prefix;
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {maxNetworkRetries: 2});
 const channels = require('./config.json').discord.channels
@@ -79,6 +78,12 @@ const addRole = async(discordID) => {
 // Execute this logic when a Discord user interacts with 
 // One of the emojis on a pinned message
 messageReactionLogic = async (messageReaction, user) => {
+
+    // Only watch for reactions to a specific post
+    if (messageReaction.message.id !== channels.EMOJI_TRIGGER_MESSAGE){
+        return
+    }
+
     const paidUser = await License.findOne(
         {'discordID':user.id}
     );

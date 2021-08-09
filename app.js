@@ -8,12 +8,12 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const discordClient = require('./discordClient');
+const bodyParser = require('body-parser')
 
 const app = express();
 
 app.use(cookieParser());
 app.use(cors({credentials: true, origin: true}));
-app.use(express.json());
 app.use(morgan('dev'));
 
 console.log(`Attempting to connect to mongo on: ${process.env.MONGO_URI}`)
@@ -25,15 +25,21 @@ mongoose.connect(process.env.MONGO_URI, { useUnifiedTopology: true, useNewUrlPar
     console.log('MongoDB Error: ' + err);
 });
 
+app.use(bodyParser.json({verify:function(req,res,buf){req.rawBody=buf}}))
+
 const { authRoutes } = require('./routes/authRoutes');
 const stripeRoutes = require('./routes/stripeRoutes');
+
+
+
+app.use('/stripe', stripeRoutes, bodyParser.raw({type: "*/*"}));
+app.use(express.json());
+app.use('/auth', authRoutes);
+
+discordClient.initClient();
 
 app.get('/hello', (req, res) => {
     res.send('Hello World!')
 })
-app.use('/auth', authRoutes);
-app.use('/stripe', stripeRoutes);
-
-discordClient.initClient();
 
 module.exports = app;

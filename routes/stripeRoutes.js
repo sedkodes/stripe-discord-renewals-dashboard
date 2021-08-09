@@ -4,6 +4,7 @@ const License = require('../models/license');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {maxNetworkRetries: 2});
 const { removeRole } = require('../discordClient');
 const config = require('../config.json');
+const endpointSecret = process.env.STRIPE_WEBHOOKSECRET_KEY;
 
 router.route('/create-checkout-session/:plan').get(async (req, res) => {
 
@@ -79,8 +80,18 @@ router.route('/customer-portal').get(async (req,res)=> {
 })
 
 router.route('/webhook').post(async (req,res)=> {
-    
+
     console.log('new webhook: ' + req.body.type + ' for: ' + req.body.data.object.customer);
+        
+    const sig = req.headers['stripe-signature'];
+  
+    try {
+      stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
+    }
+    catch (err) {
+        console.log(err.message)
+        return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
 
     switch(req.body.type){
         // Remove role from discord
