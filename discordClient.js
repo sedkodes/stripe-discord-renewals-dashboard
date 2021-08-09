@@ -8,7 +8,9 @@ const prefix = config.discord.prefix;
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {maxNetworkRetries: 2});
 const channels = require('./config.json').discord.channels
 
-let trade_channel, 
+let guild,
+    role,
+    trade_channel, 
     commands_channel,
     community_chats,
     community_alerts,
