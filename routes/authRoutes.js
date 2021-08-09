@@ -39,6 +39,11 @@ router.route('/login/callback').get(async (req,res)=>{
         );
 
         console.debug("OAuth Link Complete for: ", updatedLicense)
+
+        // Add premium role if they are paying customer.
+        if (updatedLicense.is_active && updatedLicense.stripe_customer_id) {
+            addRole(updatedLicense.discordID)
+        }
         
         // Send them back to Discord
         res.redirect(inviteLink);
