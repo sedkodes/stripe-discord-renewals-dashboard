@@ -1,8 +1,8 @@
 const express = require('express');
 const axios = require('axios');
-const { addRole, addToServer } = require('../discordClient');
+const { addRole } = require('../discordClient');
 const router = express.Router();
-const inviteLink = require('../config.json').discord.inviteLink;
+const discordIds = require('../config.json').discord;
 
 // OAuth Callback to save Discord ID & Email Combo
 // This is either called after Stripe Payment or Before
@@ -46,7 +46,7 @@ router.route('/login/callback').get(async (req,res)=>{
         }
         
         // Send them back to Discord
-        res.redirect(inviteLink);
+        res.redirect(`https://discord.com/channels/${discordIds.serverID}/${discordIds.channels.STARTHERE_CHANNEL}`);
     } catch (e) {
         console.log(e);
     }

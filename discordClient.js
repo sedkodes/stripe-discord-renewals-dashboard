@@ -84,10 +84,10 @@ messageReactionLogic = async (messageReaction, user) => {
     // Hasn't linked their Discord account with our DB
     if (!paidUser || !paidUser.discordID) {
         user.send(
-`Can't find your account.  Please try to link by clicking below:
+`Please link your account by following this link:
 https://discord.com/api/oauth2/authorize?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URI}&response_type=code&scope=email%20guilds.join%20identify
 
-Please create a ticket on the <#872910943422644244> channel with any issues or message one of <@866743642634321920> or <@337435279746924544>`
+Otherwise, create a ticket on the <#872910943422644244> channel with any issues or message one of <@866743642634321920> or <@337435279746924544>`
         )
         return
     }
