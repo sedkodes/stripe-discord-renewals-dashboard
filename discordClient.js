@@ -60,36 +60,42 @@ const initClient = () => {
     });
 }
 
-const removeRole = (discordID) => {
-    client.guilds.cache.get(serverID).members.cache.get(discordID).roles.remove(roleID);
+// Given a discord ID, remove the Premium role from their profile
+const removeRole = async (discordID) => {
+    var guildMember = await guild.members.fetch(discordID)
+    guildMember.roles.remove(role)
+    guildMember.send("Your premium subscription is now de-activated.")
 }
 
+// Given a discord ID, add the Premium role to their profile
 const addRole = async(discordID) => {
     var guildMember = await guild.members.fetch(discordID)
     guildMember.roles.add(role)
     guildMember.send("Your premium subscription is now activated.")
 }
 
-const addToServer = async(discordId, accessToken) => {
-    const user = await client.users.fetch(discordId)
-    const newMember = await client.guilds.cache.get(serverID).addMember(user, {accessToken: accessToken.access_token})
-    
-    console.log('new member invited: ', newMember.user.username)
-}
-
+// Execute this logic when a Discord user interacts with 
+// One of the emojis on a pinned message
 messageReactionLogic = async (messageReaction, user) => {
     const paidUser = await License.findOne(
         {'discordID':user.id}
     );
 
+    // Hasn't linked their Discord account with our DB
     if (!paidUser || !paidUser.discordID) {
         user.send(
-            "Can't find your account.  Please visit \n" +
-            "https://discord.com/api/oauth2/authorize?client_id=871758302919397387&redirect_uri=https%3A%2F%2Fef294f67d023.ngrok.io%2Fauth%2Flogin%2Fcallback&response_type=code&scope=email%20guilds.join%20identify\n" +
-            " to link.\n" +
-            "Please reach out to @Sedky on Discord or support@istocksignals.com for any issues."
+`Can't find your account.  Please try to link by clicking below:
+https://discord.com/api/oauth2/authorize?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URI}&response_type=code&scope=email%20guilds.join%20identify
+
+Please create a ticket on the <#872910943422644244> channel with any issues or message one of <@866743642634321920> or <@337435279746924544>`
         )
         return
+    }
+    
+    // User without Stripe details or an inactive subscription
+    if (!paidUser.stripe_customer_id || !paidUser.is_active) {
+        user.send("Cannot find an active subscription.  Please visit https://www.istocksignals.com to purchase.")
+        return;
     }
 
     // Open Account Page request
@@ -101,9 +107,9 @@ messageReactionLogic = async (messageReaction, user) => {
             return_url: 'https://istocksignals.com',
         });
 
-        user.send("please visit: " + session.url)
+        user.send("Your subscription portal: " + session.url)
 
-    // Add role to user request
+    // Add Premium role to user
     } else if (messageReaction.emoji.name === '🔓') {
     
         await addRole(user.id)
@@ -233,4 +239,4 @@ client.on('message', async msg => {
     
 });
 
-module.exports = { addToServer, addRole, initClient, removeRole };
+module.exports = { addRole, initClient, removeRole };

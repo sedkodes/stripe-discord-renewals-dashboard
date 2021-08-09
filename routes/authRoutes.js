@@ -4,12 +4,23 @@ const { addRole, addToServer } = require('../discordClient');
 const router = express.Router();
 const inviteLink = require('../config.json').discord.inviteLink;
 
-// After logging on through OAuth, Discord sends them here to tie the Discord email with the Stripe email
+// OAuth Callback to save Discord ID & Email Combo
+// This is either called after Stripe Payment or Before
+// So we don't make any assumptions about adding roles yet.
+// Adding the role is done manually by the user.
 router.route('/login/callback').get(async (req,res)=>{
     try {
         console.log("New Oauth Link attempt.")
 
         // Get Access Token and ID Token
+        if (req.query.error){
+            return res.redirect('http://localhost:3000/');
+        }
+    
+        if (!req.query.code) {
+            return res.status(403).json({msg: "Error no code"});
+        }
+
         const accessToken = await exchangeCodeForAccessToken(req)
         const discordResponse = await exchangeAccessTokenForEmail(accessToken)
         console.log("New Oauth Link attempt for: ", discordResponse.data.email)
@@ -18,7 +29,9 @@ router.route('/login/callback').get(async (req,res)=>{
             return res.error()
         }
 
-        // Save license in DB with all attributes
+        // Save discordID in DB
+        // If they've paid already, then we already have a User object
+        // With email & stripe ID, which we add Discord ID to
         const updatedLicense = await License.findOneAndUpdate(
             {'email':discordResponse.data.email},
             {'discordID':discordResponse.data.id},
@@ -27,11 +40,6 @@ router.route('/login/callback').get(async (req,res)=>{
 
         console.debug("OAuth Link Complete for: ", updatedLicense)
         
-        // console.debug("adding premium role...")
-        await addToServer(discordResponse.data.id, accessToken)
-        await addRole(discordResponse.data.id)
-        // console.log("Complete for user: " + discordResponse.data.email)
-
         // Send them back to Discord
         res.redirect(inviteLink);
     } catch (e) {
@@ -56,16 +64,7 @@ exchangeAccessTokenForEmail = async(response) => {
 }
 
 exchangeCodeForAccessToken = async(req) => {
-    if (req.query.error){
-        return res.redirect('http://localhost:3000/');
-    }
-
-    if (!req.query.code) {
-        return res.status(403).json({msg: "Error no code"});
-    }
-
-    // console.debug("code: ", req.query.code)
-
+    
     // Exchange Code for Token
     const code = req.query.code;
     const response = await axios.post(

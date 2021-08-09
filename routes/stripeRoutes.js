@@ -12,6 +12,10 @@ router.route('/create-checkout-session/:plan').get(async (req, res) => {
 
     // Create Checkout So they can Pay
     const session = await stripe.checkout.sessions.create({
+    allow_promotion_codes: true,
+      subscription_data: {
+        trial_period_days: 7,
+        },
       payment_method_types: [
         'card'
       ],
@@ -30,13 +34,23 @@ router.route('/create-checkout-session/:plan').get(async (req, res) => {
     res.redirect(303, session.url)
   });
 
-// We're redirected here after OAuth2 Flow because we need Email
+// Use OAuth2 Flow to get the customer email securely, this is the callback URL
 router.route('/customer-portal').get(async (req,res)=> {
     try {
+        
+        // Get Access Token and ID Token
+        if (req.query.error){
+            return res.status(403).json({msg: "Error in request."})
+        }
+    
+        if (!req.query.code) {
+            return res.status(403).json({msg: "Error no code"});
+        }
+
         const accessToken = await exchangeCodeForAccessToken(req)
         const discordResponse = await exchangeAccessTokenForEmail(accessToken)
 
-        console.debug('discordResponses: ', discordResponse)
+        // console.debug('discordResponses: ', discordResponse)
         if (!discordResponse) {
             return res.error()
         }
@@ -65,25 +79,35 @@ router.route('/customer-portal').get(async (req,res)=> {
 })
 
 router.route('/webhook').post(async (req,res)=> {
-    console.log('new webhook: ' + req.body.type + ' for: ' + req.body.data.object.billing_details.email);
+    
+    console.log('new webhook: ' + req.body.type + ' for: ' + req.body.data.object.customer);
 
     switch(req.body.type){
-        case 'customer.subscription.deleted': { // Remove from discord
-            const subID = req.body.data.object.id;
-            const foundLicense = await License.findOne({'paymentInfo.subscriptionID': subID});
+        // Remove role from discord
+        case 'invoice.payment_failed':
+        case 'customer.subscription.deleted': { 
+            const stripe_customer_id = req.body.data.object.customer;
+
+            // We already have customer email and Stripe customer ID saved from thei purchase
+            // Can simply use the Stripe customer ID for lookup
+            const foundUser = await License.findOneAndUpdate({stripe_customer_id}, {is_active: false});
             
-            if (foundLicense) removeRole(foundLicense.discordID);
+            if (foundUser) removeRole(foundUser.discordID);
             
             break;
         }
-        case 'charge.succeeded': {
-            
+        // Save permissions to account
+        case 'checkout.session.completed': {
+
+            // Lookup the user via EMAIL if they're already registered
+            // And linked with their Discord profile
+            // Otherwise, create a new entry and save the stripe customer ID
             const email = req.body.data.object.billing_details.email
             const stripe_customer_id = req.body.data.object.customer
 
             await License.findOneAndUpdate(
                 {email},
-                {stripe_customer_id},
+                {stripe_customer_id, is_active: true},
                 {'new':true, 'upsert': true, 'timestamps': true}
                 );
 

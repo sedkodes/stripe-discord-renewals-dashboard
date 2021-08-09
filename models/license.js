@@ -13,6 +13,10 @@ const LicenseSchema = new Schema({
     email: {
         type: String,
         required: true
+    },
+    is_active: {
+        type: Boolean,
+        required: true
     }
 });
 
