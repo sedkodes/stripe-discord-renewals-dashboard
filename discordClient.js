@@ -116,7 +116,7 @@ Otherwise, create a ticket on the <#872910943422644244> channel with any issues 
                 return_url: 'https://istocksignals.com',
             });
         } catch(error) {
-            console.log(err)
+            console.log(error)
             return res.status(400).send(`Error creating your Stripe Dashboard.  Please message an admin.`);
         }
 
