@@ -108,11 +108,17 @@ Otherwise, create a ticket on the <#872910943422644244> channel with any issues 
     // Open Account Page request
     if (messageReaction.emoji.name === '🗃️') {
 
-        //Create a customer portal and redirect them to it
-        const session = await stripe.billingPortal.sessions.create({
-            customer: paidUser.stripe_customer_id,
-            return_url: 'https://istocksignals.com',
-        });
+        let session;
+        try {
+            //Create a customer portal and redirect them to it
+            session = await stripe.billingPortal.sessions.create({
+                customer: paidUser.stripe_customer_id,
+                return_url: 'https://istocksignals.com',
+            });
+        } catch(error) {
+            console.log(err)
+            return res.status(400).send(`Error creating your Stripe Dashboard.  Please message an admin.`);
+        }
 
         user.send("Your subscription portal: " + session.url)
 
