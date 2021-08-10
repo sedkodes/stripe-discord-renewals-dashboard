@@ -117,7 +117,8 @@ Otherwise, create a ticket on the <#872910943422644244> channel with any issues 
             });
         } catch(error) {
             console.log(error)
-            return res.status(400).send(`Error creating your Stripe Dashboard.  Please message an admin.`);
+            user.send("Error creating your Dashboard.  Please contact an admin.")
+            return;
         }
 
         user.send("Your subscription portal: " + session.url)
