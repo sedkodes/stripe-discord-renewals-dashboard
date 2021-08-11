@@ -122,6 +122,8 @@ messageReactionLogic = async (messageReaction, user) => {
         {'discordID':user.id}
     );
 
+    console.log("User reaction attempt: ", paidUser)
+
     // Hasn't linked their Discord account with our DB
     // We need both discordID & email
     if (!paidUser || !paidUser.discordID || !paidUser.email) {
