@@ -47,21 +47,17 @@ router.route('/login/callback').get(async (req,res)=>{
             return res.redirect(discordIds.inviteLink)
         }
 
-        // console.log("found matching users: ", users)
-        // console.log("found matching user id: ", users[0]._id)
-        const didNotSasve = await License.findOneAndUpdate(
+        const savedUser = await License.findOneAndUpdate(
             { "_id": users[0]._id },
             {
                 'email':discordResponse.data.email,
                 'discordID':discordResponse.data.id
             })
-        // console.log("save status: ", didNotSasve)
-
-        const updatedLicense = users[0]
+        console.log("saved user: ", savedUser)
 
         // Add premium role if they are paying customer.
-        if (updatedLicense.is_active && updatedLicense.stripe_customer_id) {
-            addRole(updatedLicense.discordID, discordIds.premiumRoleId)
+        if (savedUser.is_active && savedUser.stripe_customer_id && savedUser.discordID) {
+            addRole(savedUser.discordResponse.data.id, discordIds.premiumRoleId)
         }
 
         console.log("Link attempt completed for: ", discordResponse.data.email)
