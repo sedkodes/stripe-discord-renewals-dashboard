@@ -5,7 +5,8 @@
     },
     "discord": {
         "serverID": "870683820976898058",
-        "roleID": "870695832775692298",
+        "premiumRoleId": "870695832775692298",
+        "communityMemberRole": "874319781468192819",
         "prefix": "!",
         "inviteLink": "https://discord.gg/CjdCYuWCrP",
         "channels": {
@@ -17,7 +18,9 @@
             "PREMIUM_ALERTS": "870723047043244072",
             "NEWS_TRENDS": "871425657719124008",
             "LIVE_TRADING": "872147272408916018",
-            "EMOJI_TRIGGER_MESSAGE": "874289915926573156"
-        }
+            "EMOJI_TRIGGER_MESSAGE": "874289915926573156",
+            "DISCLAIMER_CHANNEL": "874750795835383849",
+            "DISCLAIMER_TRIGGER_MESSAGE":"874752270485565481"
+        }   
     }
 }
