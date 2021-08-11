@@ -161,6 +161,7 @@ Otherwise, create a ticket on the <#872910943422644244> channel with any issues 
 
     // Add Premium role to user
     } else if (messageReaction.emoji.name === '🔓') {
+        user.send("Your subscription is now activated.")
         await addRole(user.id, config.discord.premiumRoleId)
     } else {
         return;
