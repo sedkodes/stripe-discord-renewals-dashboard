@@ -99,7 +99,7 @@ disclaimerReaction = async (messageReaction, user) => {
     // And save them in DB if they aren't already there.
     await License.findOneAndUpdate(
         {'discordID':user.id},
-        {'disclaimer_agreed': true},
+        {'disclaimer_agreed': true, 'discordID':user.id},
         {'new':true, 'upsert': true, 'timestamps': true}
     );
 

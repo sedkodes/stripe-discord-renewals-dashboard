@@ -106,7 +106,7 @@ router.route('/webhook').post(async (req,res)=> {
         case 'customer.subscription.deleted': { 
             const stripe_customer_id = req.body.data.object.customer;
 
-            // We already have customer email and Stripe customer ID saved from thei purchase
+            // We already have customer email and Stripe customer ID saved from their purchase
             // Can simply use the Stripe customer ID for lookup
             const foundUser = await License.findOneAndUpdate({stripe_customer_id}, {is_active: false});
             
@@ -125,7 +125,7 @@ router.route('/webhook').post(async (req,res)=> {
 
             await License.findOneAndUpdate(
                 {email},
-                {stripe_customer_id, is_active: true},
+                {stripe_customer_id, is_active: true, email},
                 {'new':true, 'upsert': true, 'timestamps': true}
                 );
 

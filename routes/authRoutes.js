@@ -29,12 +29,12 @@ router.route('/login/callback').get(async (req,res)=>{
             return res.error()
         }
 
-        // Save discordID in DB
+        // Save discordID in DB and email in DB
         // If they've paid already, then we already have a User object
         // With email & stripe ID, which we add Discord ID to
         const updatedLicense = await License.findOneAndUpdate(
             {'email':discordResponse.data.email},
-            {'discordID':discordResponse.data.id},
+            {'discordID':discordResponse.data.id,'email':discordResponse.data.email},
             {'new':true, 'upsert': true, 'timestamps': true}
         );
 
