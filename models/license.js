@@ -17,6 +17,10 @@ const LicenseSchema = new Schema({
     is_active: {
         type: Boolean,
         required: true
+    },
+    disclaimer_agreed: {
+        type: Boolean,
+        required: true
     }
 });
 

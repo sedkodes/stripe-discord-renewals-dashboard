@@ -36,8 +36,12 @@ router.route('/create-checkout-session/:plan').get(async (req, res) => {
   });
 
 // Use OAuth2 Flow to get the customer email securely, this is the callback URL
+// We need the customer email to find their stripe customer ID create a checkout FOR them
+// This is called from the "Account Portal" button on the website
 router.route('/customer-portal').get(async (req,res)=> {
     try {
+
+        console.info("New customer portal request.")
         
         // Get Access Token and ID Token
         if (req.query.error){
@@ -48,10 +52,12 @@ router.route('/customer-portal').get(async (req,res)=> {
             return res.status(403).json({msg: "Error no code"});
         }
 
-        const accessToken = await exchangeCodeForAccessToken(req)
-        const discordResponse = await exchangeAccessTokenForEmail(accessToken)
+        const accessToken = await exchangeCodeForAccessToken(req, '/stripe/customer-portal')
+        if (!accessToken) {
+            return res.status(403).json({msg: "Error getting your info."})
+        }
 
-        // console.debug('discordResponses: ', discordResponse)
+        const discordResponse = await exchangeAccessTokenForEmail(accessToken)
         if (!discordResponse) {
             return res.error()
         }
@@ -60,11 +66,12 @@ router.route('/customer-portal').get(async (req,res)=> {
         const paidUser = await License.findOne(
             {'email':discordResponse.data.email}
         );        
-        console.debug("paiduser: ", paidUser)
+        console.debug("Customer portal for: paiduser: ", paidUser)
 
         // If user isn't paid, redirect them to pay
+        // They don't have an account and have to purchase first.
         if (!paidUser || !paidUser.stripe_customer_id) {
-            res.redirect('https://localhost:1812/create-checkout-session/monthly');
+            return res.redirect(`${process.env.REDIRECT_URI}/stripe/create-checkout-session/monthly`);
         }
 
         // Otherwise, create a customer portal and redirect
