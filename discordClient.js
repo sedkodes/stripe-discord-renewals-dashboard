@@ -106,6 +106,7 @@ disclaimerReaction = async (messageReaction, user) => {
     // Give them the community role now that they've agreed
     // to our terms and conditions
     addRole(user.id, config.discord.communityMemberRole)
+    user.send("Thanks for joining, welcome to the club!")
 }
 
 // Execute this logic when a Discord user interacts with 
