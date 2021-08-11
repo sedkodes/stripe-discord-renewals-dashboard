@@ -4,23 +4,23 @@ const Schema = mongoose.Schema;
 const LicenseSchema = new Schema({
     stripe_customer_id: {
         type: String,
-        required: true
+        required: false
     },
     discordID: {
         type: String,
-        required: true
+        required: false
     },
     email: {
         type: String,
-        required: true
+        required: false
     },
     is_active: {
         type: Boolean,
-        required: true
+        required: false
     },
     disclaimer_agreed: {
         type: Boolean,
-        required: true
+        required: false
     }
 });
 

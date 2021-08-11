@@ -30,17 +30,38 @@ router.route('/login/callback').get(async (req,res)=>{
         }
 
         // Save discordID in DB and email in DB
-        // If they've paid already, then we already have a User object
-        // With email & stripe ID, which we add Discord ID to
-        const updatedLicense = await License.findOneAndUpdate(
-            {'email':discordResponse.data.email},
-            {'discordID':discordResponse.data.id,'email':discordResponse.data.email},
-            {'new':true, 'upsert': true, 'timestamps': true}
-        );
+        // If they've paid already before signing into Discord, then we already have a User object
+        // with email & stripe ID
+        // If they've only gone through Discord, then we may only have a disord ID
+        const users = await License.find({
+            $or:[ 
+                {'email':discordResponse.data.email}, 
+                {'discordID':discordResponse.data.id} 
+            ]
+        })
+
+        // Either way, we must have a user object by now.
+        // If not, something has happened.
+        if (!users.length) {
+            console.log("Error, no user found")
+            return res.redirect(discordIds.inviteLink)
+        }
+
+        // console.log("found matching users: ", users)
+        // console.log("found matching user id: ", users[0]._id)
+        const didNotSasve = await License.findOneAndUpdate(
+            { "_id": users[0]._id },
+            {
+                'email':discordResponse.data.email,
+                'discordID':discordResponse.data.id
+            })
+        // console.log("save status: ", didNotSasve)
+
+        const updatedLicense = users[0]
 
         // Add premium role if they are paying customer.
         if (updatedLicense.is_active && updatedLicense.stripe_customer_id) {
-            addRole(updatedLicense.discordID, config.discord.premiumRoleId)
+            addRole(updatedLicense.discordID, discordIds.premiumRoleId)
         }
 
         console.log("Link attempt completed for: ", discordResponse.data.email)
