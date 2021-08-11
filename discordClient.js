@@ -14,7 +14,8 @@ let guild,
     community_chats,
     community_alerts,
     starthere_channel,
-    emoji_trigger_message
+    emoji_trigger_message,
+    disclaimer_trigger_message
 
 const initClient = () => {
     client.login(process.env.DISCORD_TOKEN);
@@ -57,6 +58,17 @@ const initClient = () => {
             return
         }
 
+        disclaimer_channel = client.channels.cache.get(channels.DISCLAIMER_CHANNEL)
+        if (starthere_channel == undefined) {
+            console.error("The community channel isn't found!")
+            return
+        } 
+        disclaimer_trigger_message = await disclaimer_channel.messages.fetch(channels.DISCLAIMER_TRIGGER_MESSAGE)
+        if (disclaimer_trigger_message == undefined) {
+            console.error("The disclaimer trigger message isn't found!")
+            return
+        }
+
         console.log('Discord client is ready');
     });
 }
@@ -69,10 +81,35 @@ const removeRole = async (discordID) => {
 }
 
 // Given a discord ID, add the Premium role to their profile
-const addRole = async(discordID) => {
+const addRole = async(discordID, roleId) => {
     var guildMember = await guild.members.fetch(discordID)
-    guildMember.roles.add(role)
-    guildMember.send("Your premium subscription is now activated.")
+    guildMember.roles.add(roleId)
+}
+
+// If they agree to the disclaimer, add them to the
+// Database using their discord ID and then 
+// set their "disclaimer_agreed" to true
+disclaimerReaction = async (messageReaction, user) => {
+    // Only watch for reactions to a specific post
+    if (messageReaction.message.id !== channels.DISCLAIMER_TRIGGER_MESSAGE ||
+        messageReaction.emoji.name !== '✅'){
+        return
+    }
+
+    console.log(messageReaction)
+    console.log(user)
+
+    // Set that they have agreed to the disclaimer
+    // And save them in DB if they aren't already there.
+    await License.findOneAndUpdate(
+        {'discordID':user.id},
+        {'disclaimer_agreed': true},
+        {'new':true, 'upsert': true, 'timestamps': true}
+    );
+
+    // Give them the community role now that they've agreed
+    // to our terms and conditions
+    addRole(user.id, config.discord.communityMemberRole)
 }
 
 // Execute this logic when a Discord user interacts with 
@@ -89,10 +126,13 @@ messageReactionLogic = async (messageReaction, user) => {
     );
 
     // Hasn't linked their Discord account with our DB
-    if (!paidUser || !paidUser.discordID) {
+    // We need both discordID & email
+    if (!paidUser || !paidUser.discordID || !paidUser.email) {
         user.send(
 `Please link your account by following this link:
 https://discord.com/api/oauth2/authorize?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URI}&response_type=code&scope=email%20guilds.join%20identify
+
+Then try that action again.
 
 Otherwise, create a ticket on the <#872910943422644244> channel with any issues or message one of <@866743642634321920> or <@337435279746924544>`
         )
@@ -125,19 +165,41 @@ Otherwise, create a ticket on the <#872910943422644244> channel with any issues 
 
     // Add Premium role to user
     } else if (messageReaction.emoji.name === '🔓') {
-    
-        await addRole(user.id)
+        await addRole(user.id, config.discord.premiumRoleId)
     } else {
         return;
     }
 }
 
+// When somebody joins, we send them a welcome
+// message and give them instructions on how 
+// To agree to the disclaimer and sign up, etc.
+client.on("guildMemberAdd", async function(member){
+    
+    const welcomeMessage = 
+    `
+Welcome ${member} to iStockSignals Alerts!
+
+After you read and accept the message in <#874750795835383849>, our free community section will open up to you!  If you are looking for Live alerts, you can find that in our Premium Section.
+
+If you need any help, please head over to our <#872910943422644244> section.
+
+To get these premium alerts sent right to you on Discord, go to <#871423199408193576> channel. or you can go to https://istocksignals.com/ signing up through our website is quick, simple, and will automatically assign the roles inside discord for you!
+
+Happy hunting.
+    `
+    
+    member.send(welcomeMessage)
+});
+
 // User Emoji Listeners
 client.on("messageReactionRemove", async function(messageReaction, user){
     messageReactionLogic(messageReaction, user)
+    disclaimerReaction(messageReaction, user)
 })
 client.on("messageReactionAdd", async function(messageReaction, user){
     messageReactionLogic(messageReaction, user)
+    disclaimerReaction(messageReaction, user)
 });
 
 // Admin Commands
