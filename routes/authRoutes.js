@@ -56,8 +56,8 @@ router.route('/login/callback').get(async (req,res)=>{
         console.log("saved user: ", savedUser)
 
         // Add premium role if they are paying customer.
-        if (savedUser.is_active && savedUser.stripe_customer_id && savedUser.discordID) {
-            addRole(savedUser.discordResponse.data.id, discordIds.premiumRoleId)
+        if (savedUser.is_active && savedUser.stripe_customer_id) {
+            addRole(discordResponse.data.id, discordIds.premiumRoleId)
         }
 
         console.log("Link attempt completed for: ", discordResponse.data.email)
