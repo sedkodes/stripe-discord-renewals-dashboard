@@ -130,7 +130,7 @@ messageReactionLogic = async (messageReaction, user) => {
     if (!paidUser || !paidUser.discordID || !paidUser.email) {
         user.send(
 `Please link your account by following this link:
-https://discord.com/api/oauth2/authorize?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URI}&response_type=code&scope=email%20guilds.join%20identify
+https://discord.com/api/oauth2/authorize?client_id=${process.env.CLIENT_ID}&redirect_uri=${process.env.REDIRECT_URI}/auth/login/callback&response_type=code&scope=email%20guilds.join%20identify
 
 Then try that action again.
 
