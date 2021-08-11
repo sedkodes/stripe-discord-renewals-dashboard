@@ -77,7 +77,6 @@ const initClient = () => {
 const removeRole = async (discordID) => {
     var guildMember = await guild.members.fetch(discordID)
     guildMember.roles.remove(role)
-    guildMember.send("Your premium subscription is now de-activated.")
 }
 
 // Given a discord ID, add the Premium role to their profile
@@ -95,9 +94,6 @@ disclaimerReaction = async (messageReaction, user) => {
         messageReaction.emoji.name !== '✅'){
         return
     }
-
-    console.log(messageReaction)
-    console.log(user)
 
     // Set that they have agreed to the disclaimer
     // And save them in DB if they aren't already there.
