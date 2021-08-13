@@ -140,7 +140,7 @@ Otherwise, create a ticket on the <#872910943422644244> channel with any issues 
     
     // User without Stripe details or an inactive subscription
     if (!paidUser.stripe_customer_id || !paidUser.is_active) {
-        user.send("Cannot find an active subscription.  Please visit https://www.istocksignals.com to purchase.")
+        user.send(`Cannot find an active subscription.  Please visit ${config.homepageUrl} to purchase.`)
         return;
     }
 

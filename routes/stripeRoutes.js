@@ -27,8 +27,8 @@ router.route('/create-checkout-session/:plan').get(async (req, res) => {
         },
       ],
       mode: 'subscription',
-      success_url: config.discord.inviteLink,
-      cancel_url: config.discord.inviteLink,
+      success_url: config.homepageUrl,
+      cancel_url: config.homepageUrl,
     });
 
     // Take them to Checkout
@@ -77,7 +77,7 @@ router.route('/customer-portal').get(async (req,res)=> {
         // Otherwise, create a customer portal and redirect
         const session = await stripe.billingPortal.sessions.create({
             customer: paidUser.stripe_customer_id,
-            return_url: 'https://istocksignals.com',
+            return_url: config.homepageUrl,
         });
 
         return res.redirect(session.url)
