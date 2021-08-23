@@ -27,7 +27,7 @@ router.route('/create-checkout-session/:plan').get(async (req, res) => {
         },
       ],
       mode: 'subscription',
-      success_url: config.homepageUrl,
+      success_url: config.discord.inviteLink,
       cancel_url: config.homepageUrl,
     });
 
