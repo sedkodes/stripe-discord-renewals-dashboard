@@ -15,7 +15,8 @@ let guild,
     community_alerts,
     starthere_channel,
     emoji_trigger_message,
-    disclaimer_trigger_message
+    disclaimer_trigger_message,
+    admin_channel
 
 const initClient = () => {
     client.login(process.env.DISCORD_TOKEN);
@@ -59,7 +60,7 @@ const initClient = () => {
         }
 
         disclaimer_channel = client.channels.cache.get(channels.DISCLAIMER_CHANNEL)
-        if (starthere_channel == undefined) {
+        if (disclaimer_channel == undefined) {
             console.error("The community channel isn't found!")
             return
         } 
@@ -68,6 +69,12 @@ const initClient = () => {
             console.error("The disclaimer trigger message isn't found!")
             return
         }
+
+        admin_channel = client.channels.cache.get(channels.ADMIN)
+        if (admin_channel == undefined) {
+            console.error("The admin channel isn't found!")
+            return
+        } 
 
         console.log('Discord client is ready');
     });
@@ -315,4 +322,8 @@ client.on('message', async msg => {
     
 });
 
-module.exports = { addRole, initClient, removeRole };
+const logToAdmin = (message) => {
+    admin_channel.send(message)
+}
+
+module.exports = { addRole, initClient, removeRole, logToAdmin };

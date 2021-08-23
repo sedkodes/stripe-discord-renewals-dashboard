@@ -14,7 +14,10 @@ const app = express();
 
 app.use(cookieParser());
 app.use(cors({credentials: true, origin: true}));
-app.use(morgan('dev'));
+app.use(morgan('dev', {
+    // Skip hello endpoint checks
+    skip: function (req, res) { return req.originalUrl == "/hello" }
+}))
 
 console.log(`Attempting to connect to mongo on: ${process.env.MONGO_URI}`)
 mongoose.connect(process.env.MONGO_URI, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false})
