@@ -113,7 +113,7 @@ disclaimerReaction = async (messageReaction, user) => {
     // Give them the community role now that they've agreed
     // to our terms and conditions
     addRole(user.id, config.discord.communityMemberRole)
-    user.send("Thanks for joining, welcome to the club!")
+    user.send("Thanks for joining, welcome to the club!").catch(console.error)
 }
 
 // Execute this logic when a Discord user interacts with 
@@ -141,13 +141,13 @@ https://discord.com/api/oauth2/authorize?client_id=${process.env.CLIENT_ID}&redi
 Then try that action again.
 
 Otherwise, create a ticket on the <#872910943422644244> channel with any issues or message one of <@866743642634321920> or <@337435279746924544>`
-        )
+        ).catch(console.error)
         return
     }
     
     // User without Stripe details or an inactive subscription
     if (!paidUser.stripe_customer_id || !paidUser.is_active) {
-        user.send(`Cannot find an active subscription.  Please visit ${config.homepageUrl} to purchase.`)
+        user.send(`Cannot find an active subscription.  Please visit ${config.homepageUrl} to purchase.`).catch(console.error)
         return;
     }
 
@@ -163,15 +163,15 @@ Otherwise, create a ticket on the <#872910943422644244> channel with any issues 
             });
         } catch(error) {
             console.log(error)
-            user.send("Error creating your Dashboard.  Please contact an admin.")
+            user.send("Error creating your Dashboard.  Please contact an admin.").catch(console.error)
             return;
         }
 
-        user.send("Your subscription portal: " + session.url)
+        user.send("Your subscription portal: " + session.url).catch(console.error)
 
     // Add Premium role to user
     } else if (messageReaction.emoji.name === '🔓') {
-        user.send("Your subscription is now activated.")
+        user.send("Your subscription is now activated.").catch(console.error)
         await addRole(user.id, config.discord.premiumRoleId)
     } else {
         return;
@@ -196,7 +196,7 @@ To get these premium alerts sent right to you on Discord, go to <#87142319940819
 Happy hunting.
     `
     
-    member.send(welcomeMessage)
+    member.send(welcomeMessage).catch(console.error)
 });
 
 // User Emoji Listeners
