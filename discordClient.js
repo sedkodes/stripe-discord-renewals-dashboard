@@ -82,8 +82,8 @@ const initClient = () => {
 
 // Given a discord ID, remove the Premium role from their profile
 const removeRole = async (discordID) => {
-    var guildMember = await guild.members.fetch(discordID)
-    guildMember.roles.remove(role)
+    var guildMember = await guild.members.fetch(discordID).catch(console.error)
+    if (guildMember) guildMember.roles.remove(role)
 }
 
 // Given a discord ID, add the Premium role to their profile
@@ -246,7 +246,6 @@ client.on('message', async msg => {
             return;
         }
 
-        console.log("New signal. Attempting to send.")
         const embeddedMessage = { 
             embed: {
                 color: 3447003,
@@ -281,8 +280,7 @@ client.on('message', async msg => {
         // Get rid of first line and capture channel id at same time
         const args = msg.content.slice(prefix.length).trim().split((/\r?\n/));
         const channelId = args.shift()?.split(/\s/)[1]
-        console.log(args)
-        console.log(channelId)
+        
         // If message or channel id are omitted, leave
         if (!args.length || !channelId) {
             msg.channel.send(`

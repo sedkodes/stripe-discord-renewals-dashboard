@@ -8,6 +8,7 @@ const endpointSecret = process.env.STRIPE_WEBHOOKSECRET_KEY;
 
 router.route('/create-checkout-session/:plan').get(async (req, res) => {
 
+    logToAdmin("New Checkout Session created!")
     // Create monthly or yearly plan
     const plan = req.params.plan === 'monthly' ? config.stripe.monthlyPlan : config.stripe.yearlyPlan
 
