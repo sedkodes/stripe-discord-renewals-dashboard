@@ -83,7 +83,7 @@ const initClient = () => {
 // Given a discord ID, remove the Premium role from their profile
 const removeRole = async (discordID) => {
     var guildMember = await guild.members.fetch(discordID).catch(console.error)
-    if (guildMember) guildMember.roles.remove(role)
+    if (guildMember && guildMember.roles) guildMember.roles.remove(role)
 }
 
 // Given a discord ID, add the Premium role to their profile
